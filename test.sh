@@ -25,5 +25,6 @@ assert 4 "(3+5)/2;"
 assert 10 "-10+20;"
 assert 2 "a=2;"
 assert 3 "a=2+1;"
+assert 4 "foo = 3 + 1;"
 
 echo OK
