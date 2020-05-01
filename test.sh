@@ -26,5 +26,7 @@ assert 10 "-10+20;"
 assert 2 "a=2;"
 assert 3 "a=2+1;"
 assert 4 "foo = 3 + 1;"
+assert 5 "return 3+2;"
+assert 3 "a=1;return a+2;"
 
 echo OK
