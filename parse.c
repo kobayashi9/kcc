@@ -17,6 +17,15 @@ LVar *locals;
 
 LVar *find_lvar(Token *tok);
 
+static bool is_alnum(char c);
+
+bool is_alnum(char c) {
+    return (('a' <= c && c <= 'z') ||
+            ('A' <= c && c <= 'z') ||
+            ('0' <= c && c <= '9') ||
+            (c == '_'));
+}
+
 void program() {
     int i = 0;
     while (!at_eof())
@@ -36,7 +45,15 @@ Node *expr() {
 }
 
 Node *stmt() {
-    Node *node = expr();
+    Node *node;
+
+    if (consume("return")) {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_RETURN;
+        node->lhs = expr();
+    } else {
+        node = expr();
+    }
     expect(";");
     return node;
 }
@@ -119,6 +136,7 @@ Node *primary() {
         expect(")");
         return node;
     }
+
     Token *tok = consume_ident();
     if (tok) {
         Node *node = calloc(1, sizeof(Node));
@@ -226,6 +244,13 @@ Token *tokenize() {
             p++;
             continue;
         }
+        // 6文字読み進めてreturn + (空白)だった場合return文
+        // としてトークナイズする
+        if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
+            cur = new_token(TK_RESERVED, cur, p, 6);
+            p += 6;
+            continue;
+        }
         // Multi-letter punctuator
         if (startswith(p, "==") || startswith(p, "!=") ||
             startswith(p, "<=") || startswith(p, ">=")) {
@@ -247,10 +272,11 @@ Token *tokenize() {
             cur->val = strtol(p, &p, 10);
             continue;
         }
-        if ('a' <= *p && *p <= 'z') {
+        // Alpabet check
+        if (is_alnum(*p)) {
             int len = 0;
             char *tmp = p;
-            while('a' <= *p && *p <= 'z') {
+            while(is_alnum(*p)) {
                 len++;
                 p++;
             }
