@@ -17,13 +17,35 @@ LVar *locals;
 
 LVar *find_lvar(Token *tok);
 
-static bool is_alnum(char c);
+static bool is_alpha(char c);
 
 bool is_alnum(char c) {
+    return  is_alpha(c) || ('0' <= c && c <= '9');
+}
+
+bool is_alpha(char c) {
     return (('a' <= c && c <= 'z') ||
-            ('A' <= c && c <= 'z') ||
-            ('0' <= c && c <= '9') ||
-            (c == '_'));
+            ('A' <= c && c <= 'Z') ||
+            c == '_');
+}
+
+char *starts_with_reversed(char *p) {
+    static char *kw[] = {"return", "if", "else", "while", "for"};
+    
+    for (int i = 0; i < sizeof(kw)/sizeof(*kw) ; i++) {
+        int len = strlen(kw[i]);
+        if (startswith(p, kw[i]) && !is_alnum(p[len])) {
+            return kw[i];
+        }
+    }
+    static char *ops[] = {"==", "!=", "<=", ">="};
+    for (int i = 0; i < sizeof(ops)/sizeof(*ops); i++) {
+        int len = strlen(ops[i]);
+        if (startswith(p, ops[i]) && !is_alnum(p[len])) {
+            return ops[i];
+        }
+    }
+    return NULL;
 }
 
 void program() {
@@ -244,20 +266,14 @@ Token *tokenize() {
             p++;
             continue;
         }
-        // 6文字読み進めてreturn + (空白)だった場合return文
-        // としてトークナイズする
-        if (strncmp(p, "return", 6) == 0 && !is_alnum(p[6])) {
-            cur = new_token(TK_RESERVED, cur, p, 6);
-            p += 6;
+        // Keywords or multi-letter puctuators
+        char *kw = starts_with_reversed(p);
+        if (kw) {
+            int len = strlen(kw);
+            cur = new_token(TK_RESERVED, cur, p, len);
+            p += len;
             continue;
         }
-        // Multi-letter punctuator
-        if (startswith(p, "==") || startswith(p, "!=") ||
-            startswith(p, "<=") || startswith(p, ">=")) {
-            cur = new_token(TK_RESERVED, cur, p, 2);
-            p += 2;
-            continue;
-            }
 
         // Single-letter punctuator
         if (strchr("+-*/()<>;=", *p)) {
@@ -272,8 +288,8 @@ Token *tokenize() {
             cur->val = strtol(p, &p, 10);
             continue;
         }
-        // Alpabet check
-        if (is_alnum(*p)) {
+        // Identifier
+        if (is_alpha(*p)) {
             int len = 0;
             char *tmp = p;
             while(is_alnum(*p)) {
