@@ -4,6 +4,18 @@ Token *token;
 
 char *user_input;
 
+static char *read_file(char *path) {
+    FILE *fp = fopen(path, "r");
+    if (!fp) {
+        error("cannot open %s: %s", path, strerror(errno));
+    }
+    int filemax = 10 * 1024 * 1024;
+    char *buf = malloc(filemax);
+    fread(buf, 1, filemax, fp);
+    return buf;
+}
+
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "引数の個数が正しくありません\n");
@@ -11,7 +23,7 @@ int main(int argc, char **argv) {
     }
 
     // トークナイズする
-    user_input = argv[1];
+    user_input = read_file(argv[1]);
     token = tokenize();
     program();
 
