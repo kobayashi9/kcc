@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "kcc.h"
 
 static int labelseq = 1;
 

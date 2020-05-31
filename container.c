@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "kcc.h"
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
     Node *node = calloc(1, sizeof(Node));

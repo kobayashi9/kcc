@@ -1,4 +1,4 @@
-#include "9cc.h"
+#include "kcc.h"
 
 Node *code[100];
 
@@ -88,6 +88,7 @@ Node *stmt() {
             node->els = stmt();
         return node;
     }
+    
     node = expr();
     expect(";");
     return node;
