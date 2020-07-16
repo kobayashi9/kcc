@@ -23,7 +23,8 @@ int main(int argc, char **argv) {
     }
 
     // トークナイズする
-    user_input = read_file(argv[1]);
+    // user_input = read_file(argv[1]);
+    user_input = argv[1];
     token = tokenize();
     program();
 
