@@ -31,5 +31,6 @@ assert 3 "a=1;return a+2;"
 assert 3 "A3 = 3; return A3;"
 assert 1 "if(1 == 1) return 1;"
 assert 0 "if (1 == 2) return 1; else return 0;"
+assert 4 "a = 2; b = 2; while (a == b) a = a + 2; return a;"
 
 echo OK
