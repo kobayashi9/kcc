@@ -27,8 +27,7 @@ char *starts_with_reversed(char *p) {
     }
     static char *ops[] = {"==", "!=", "<=", ">="};
     for (int i = 0; i < sizeof(ops)/sizeof(*ops); i++) {
-        int len = strlen(ops[i]);
-        if (startswith(p, ops[i]) && !is_alnum(p[len])) {
+        if (startswith(p, ops[i])) {
             return ops[i];
         }
     }
