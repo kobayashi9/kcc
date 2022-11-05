@@ -70,6 +70,14 @@ void gen(Node *node) {
         printf(".L.break.%d:\n", seq);
         return;
     }
+    case ND_BLOCK: {
+        while (node->body != NULL) {
+            gen(node->body);
+            printf("    pop rax\n");
+            node = node->body;
+        }
+        return;
+    }
     }
     
     switch (node->kind) {

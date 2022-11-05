@@ -94,6 +94,20 @@ Node *stmt() {
         node->then = stmt();
         return node;
     }
+    
+    if (consume("{")) {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_BLOCK;
+        Node *blockVector = node;
+        node->body = blockVector;
+        while (!consume("}")) {
+            blockVector->body = calloc(1, sizeof(Node));
+            blockVector->body = stmt();
+            blockVector = blockVector->body;
+        }
+        blockVector->body = NULL;
+        return node;
+    }
 
     node = expr();
     expect(";");

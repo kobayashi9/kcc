@@ -24,6 +24,7 @@ typedef enum {
     ND_WHILE,   // while文
     ND_FOR,     // for文
     ND_NUM, // 整数
+    ND_BLOCK //ブロック
 } NodeKind;
 
 typedef struct Node Node;
@@ -41,7 +42,7 @@ struct Node {
     Node *els;
     Node *init;
     Node *inc;
-
+    Node *body;
 };
 
 // トークンの種類
