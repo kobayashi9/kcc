@@ -1,6 +1,8 @@
 #include "kcc.h"
 
 static int labelseq = 1;
+static char funcname[50];
+static char funcargs[7][4] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 
 void gen_lval(Node *node) {
     if (node->kind != ND_LVAR)
@@ -99,6 +101,23 @@ void gen(Node *node) {
         printf("    mov [rax], rdi\n");
         printf("    push rdi\n");
         return;
+    case ND_FUNCTION: {
+        int funcargsIndex = 0;
+        for(int i = 0; i < node->len; i++) {
+            funcname[i] = node->name[i];
+        }
+        funcname[node->len] = '\0';
+
+        while(node->args != NULL &&  funcargsIndex< 6) {
+            gen(node->args);
+            printf("    pop %s\n", funcargs[funcargsIndex]);
+            node = node->args;
+            funcargsIndex++;
+        }
+        printf("    call %s\n", funcname);
+        printf("    push rax\n");
+        return;
+    }
     }
     gen(node->lhs);
     gen(node->rhs);

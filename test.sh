@@ -2,9 +2,15 @@
 assert() {
     expected="$1"
     input="$2"
+    other="$3"
 
     ./kcc "$input" > tmp.s
-    cc -o tmp tmp.s
+    if [ "$other" = "" ]; then
+        cc -o tmp tmp.s
+    else
+        cc -c ./test/"$other".c
+        cc -o tmp tmp.s "$other".o
+    fi
     ./tmp
     actual="$?"
     if [ "$actual" = "$expected" ]; then
@@ -37,5 +43,10 @@ assert 3 "for(a=0; a<3; a=a+1) 1; return a;"
 assert 14 "i = 0; for(a=0; a<3; a=a+1) {i = i + 1; i = i * 2;} return i;"
 assert 2 "i = 0; if(i == 0) { i = 1; i = i * 2;} else {i = 3; i = i + 1;} return i;"
 assert 1 "{i = 1; i = i + 1; i = i - 1;} return i;"
+assert 5 "i=foo(); return i;" callfunc
+assert 2 "i=0; i=foo2(2); return i;" callfunc
+assert 5 "i=0; i=foo3(2, 3); return i;" callfunc
+assert 21 "{i=0; i=foo4(1, 2, 3, 4, 5, 6); return i;}" callfunc
+assert 1 "{i=0; foo5(); i=1; return i;}" callfunc
 
 echo OK

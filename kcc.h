@@ -24,7 +24,8 @@ typedef enum {
     ND_WHILE,   // while文
     ND_FOR,     // for文
     ND_NUM, // 整数
-    ND_BLOCK //ブロック
+    ND_BLOCK, //ブロック
+    ND_FUNCTION // 関数
 } NodeKind;
 
 typedef struct Node Node;
@@ -43,6 +44,9 @@ struct Node {
     Node *init;
     Node *inc;
     Node *body;
+    char *name;     // 関数名
+    int len;        // 関数名の長さ
+    Node *args;      // 関数の実引数
 };
 
 // トークンの種類
