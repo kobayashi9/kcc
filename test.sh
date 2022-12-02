@@ -51,4 +51,5 @@ assert 1 "main(){i=0; foo5(); i=1; return i;}" callfunc
 assert 3 "main(){a=1;b = 1; return func()+b;} func(){b = 2; return b;}"
 assert 3 "main(){return func(1, 2);} func(i, j){return i+j;}"
 assert 55 "main(){return fib(10);} fib(n){if(n == 0){return 0;} else if(n == 1) {return 1;} else {return fib(n-1)+ fib(n-2);}}"
+assert 3 "main(){x = 3; y = 5; z = &y + 8; return *z;}"
 echo OK

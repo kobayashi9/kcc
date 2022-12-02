@@ -26,7 +26,9 @@ typedef enum {
     ND_NUM, // 整数
     ND_BLOCK, //ブロック
     ND_FUNCTION, // 関数
-    ND_FUNCDEF // 関数定義
+    ND_FUNCDEF, // 関数定義
+    ND_ADDR,    // アドレス参照
+    ND_DEREF    // 間接参照
 } NodeKind;
 
 typedef struct Node Node;
