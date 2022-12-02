@@ -23,8 +23,44 @@ void program() {
     locals->offset = 0;
     
     while (!at_eof())
-        code[i++] = stmt();
+        code[i++] = def_func();
     code[i] = NULL;
+}
+
+// 関数定義
+Node *def_func() {
+    Token *tok = consume_ident();
+    Node *node = calloc(1, sizeof(Node));
+    if (tok) {
+        expect("(");
+        node->kind = ND_FUNCDEF;
+        node->name = tok->str;
+        node->len = tok->len;
+        if(!consume(")")) {
+            Node* argVector = node;
+            node->args = argVector;
+            do {
+                argVector->args = expr();
+                argVector = argVector->args;
+                if(argVector->kind != ND_LVAR){
+                    error_at(token->str, "変数ではありません。");
+                }
+            }
+            while(consume(","));
+            argVector->args = NULL;
+            expect(")");
+        }
+        expect("{");
+        Node *fnVector = node;
+        node->fn = fnVector;
+        while(!consume("}")) {
+            fnVector->fn = calloc(1, sizeof(Node));
+            fnVector->fn = stmt();
+            fnVector = fnVector->fn;
+        }
+        fnVector->fn = NULL;
+        return node;
+    } 
 }
 
 Node *assign() {
@@ -259,6 +295,7 @@ extern Token *consume_ident() {
 void expect(char *op) {
     if (token->kind != TK_RESERVED || strlen(op) != token->len ||
         memcmp(token->str, op, token->len)) {
+        fprintf(stderr, "%c\n", *op);
         error_at(token->str, "'%c'ではありません", op);
         }
     token = token->next;

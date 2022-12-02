@@ -25,7 +25,8 @@ typedef enum {
     ND_FOR,     // for文
     ND_NUM, // 整数
     ND_BLOCK, //ブロック
-    ND_FUNCTION // 関数
+    ND_FUNCTION, // 関数
+    ND_FUNCDEF // 関数定義
 } NodeKind;
 
 typedef struct Node Node;
@@ -47,6 +48,7 @@ struct Node {
     char *name;     // 関数名
     int len;        // 関数名の長さ
     Node *args;      // 関数の実引数
+    Node *fn;       // 関数定義
 };
 
 // トークンの種類
@@ -77,6 +79,7 @@ extern Token *token;
 
 extern Node *code[100];
 
+extern Node *def_func();
 extern Node *assign();
 extern Node *expr();
 extern Node *stmt();

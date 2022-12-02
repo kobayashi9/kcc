@@ -118,6 +118,33 @@ void gen(Node *node) {
         printf("    push rax\n");
         return;
     }
+    case ND_FUNCDEF: {
+        int funcargsIndex = 0;
+        for(int i = 0; i < node->len; i++) {
+            funcname[i] = node->name[i];
+        }
+        funcname[node->len] = '\0';
+        printf("%s:\n", funcname);
+        printf("    push rbp\n");
+        printf("    mov rbp, rsp\n");
+        printf("    sub rsp, 208\n");
+        Node *argVector = node;
+        while(argVector->args != NULL &&  funcargsIndex< 6) {
+            gen_lval(argVector->args);
+            printf("    push %s\n", funcargs[funcargsIndex]);
+            printf("    pop rdi\n");
+            printf("    pop rax\n");
+            printf("    mov [rax], rdi\n");
+            printf("    push rdi\n");    
+            argVector = argVector->args;
+            funcargsIndex++;
+        }    
+        while(node->fn != NULL) {
+            gen(node->fn);
+            node = node->fn;
+        }
+        return;
+    }
     }
     gen(node->lhs);
     gen(node->rhs);
