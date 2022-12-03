@@ -29,6 +29,7 @@ void program() {
 
 // 関数定義
 Node *def_func() {
+    expect("int");
     Token *tok = consume_ident();
     Node *node = calloc(1, sizeof(Node));
     if (tok) {
@@ -40,11 +41,12 @@ Node *def_func() {
             Node* argVector = node;
             node->args = argVector;
             do {
-                argVector->args = expr();
-                argVector = argVector->args;
-                if(argVector->kind != ND_LVAR){
-                    error_at(token->str, "変数ではありません。");
+                expect("int");
+                if(token->kind != TK_IDENT) {
+                    error_at(tok->str, "変数ではありません。");
                 }
+                argVector->args = dcl();
+                argVector = argVector->args;
             }
             while(consume(","));
             argVector->args = NULL;
@@ -63,6 +65,22 @@ Node *def_func() {
     } 
 }
 
+Node *dcl(){
+    Node *node;
+    LVar *lvar;
+    node = calloc(1, sizeof(Node)); 
+    lvar = calloc(1, sizeof(LVar));
+    lvar->next = locals;
+    lvar->name = token->str;
+    lvar->len = token->len;
+    lvar->offset = locals->offset + 8;
+    node->offset = lvar->offset;
+    locals = lvar;   
+    node->kind = ND_LVAR;
+    token = token->next; 
+    return node;
+}
+ 
 Node *assign() {
     Node *node = equality();
     if (consume("="))
@@ -142,6 +160,16 @@ Node *stmt() {
             blockVector = blockVector->body;
         }
         blockVector->body = NULL;
+        return node;
+    }
+
+    if (consume("int")) {
+        if (token->kind == TK_IDENT) {
+            node = dcl();
+        } else {
+            error_at(token->str, "識別子ではありません");
+        }
+        expect(";");
         return node;
     }
 
@@ -261,13 +289,7 @@ Node *primary() {
             if (lvar) {
                 node->offset = lvar->offset;
             } else {
-                lvar = calloc(1, sizeof(LVar));
-                lvar->next = locals;
-                lvar->name = tok->str;
-                lvar->len = tok->len;
-                lvar->offset = locals->offset + 8;
-                node->offset = lvar->offset;
-                locals = lvar;
+                error_at(tok->str, "変数が宣言されていません。");
             }
         }   
         return node;
@@ -302,8 +324,7 @@ extern Token *consume_ident() {
 void expect(char *op) {
     if (token->kind != TK_RESERVED || strlen(op) != token->len ||
         memcmp(token->str, op, token->len)) {
-        fprintf(stderr, "%c\n", *op);
-        error_at(token->str, "'%c'ではありません", op);
+        error_at(token->str, "'%s'ではありません", op);
         }
     token = token->next;
 }

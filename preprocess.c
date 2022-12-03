@@ -18,7 +18,7 @@ bool startswith(char *p, char *q) {
 
 char *starts_with_reversed(char *p) {
     static char *kw[] = {"return", "if", "else", "while", "for"};
-    
+
     for (int i = 0; i < sizeof(kw)/sizeof(*kw) ; i++) {
         int len = strlen(kw[i]);
         if (startswith(p, kw[i]) && !is_alnum(p[len])) {
@@ -29,6 +29,12 @@ char *starts_with_reversed(char *p) {
     for (int i = 0; i < sizeof(ops)/sizeof(*ops); i++) {
         if (startswith(p, ops[i])) {
             return ops[i];
+        }
+    }
+    static char *types[] = {"int"};
+    for (int i = 0; i < sizeof(types)/sizeof(*types); i++) {
+        if (startswith(p, types[i])) {
+            return types[i];
         }
     }
     return NULL;

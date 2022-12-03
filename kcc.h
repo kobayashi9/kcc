@@ -82,6 +82,7 @@ extern Token *token;
 extern Node *code[100];
 
 extern Node *def_func();
+extern Node *dcl();
 extern Node *assign();
 extern Node *expr();
 extern Node *stmt();
