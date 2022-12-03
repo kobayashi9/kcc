@@ -15,6 +15,23 @@ struct LVar {
 // ローカル変数
 static LVar *locals;
 
+static Node *def_func();
+static Node *dcl();
+static Node *assign();
+static Node *expr();
+static Node *stmt();
+static Node *expr();
+static Node *equality();
+static Node *relational();
+static Node *add();
+static Node *mul();
+static Node *unary();
+static Node *primary();
+static bool at_eof();
+static int expect_number();
+static void expect(char *op);
+static Token *consume_ident();
+static bool consume(char *op);
 static LVar *find_lvar(Token *tok);
 
 void program() {
@@ -28,7 +45,7 @@ void program() {
 }
 
 // 関数定義
-Node *def_func() {
+static Node *def_func() {
     expect("int");
     Token *tok = consume_ident();
     Node *node = calloc(1, sizeof(Node));
@@ -65,7 +82,7 @@ Node *def_func() {
     } 
 }
 
-Node *dcl(){
+static Node *dcl(){
     Node *node;
     LVar *lvar;
     node = calloc(1, sizeof(Node)); 
@@ -81,18 +98,18 @@ Node *dcl(){
     return node;
 }
  
-Node *assign() {
+static Node *assign() {
     Node *node = equality();
     if (consume("="))
         node = new_node(ND_ASSIGN, node, assign());
     return node;
 }
 
-Node *expr() {
+static Node *expr() {
     return assign();
 }
 
-Node *stmt() {
+static Node *stmt() {
     Node *node;
 
     if (consume("return")) {
@@ -179,7 +196,7 @@ Node *stmt() {
 }
 
 // equality = relational ("==" relational | "!=" relational)*
-Node *equality() {
+static Node *equality() {
     Node *node = relational();
 
     for (;;) {
@@ -193,7 +210,7 @@ Node *equality() {
 }
 
 // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-Node *relational() {
+static Node *relational() {
     Node *node = add();
 
     for (;;) {
@@ -211,7 +228,7 @@ Node *relational() {
     }
 }
 // add = mul ("+" mul | "-" mul)*
-Node *add() {
+static Node *add() {
     Node *node = mul();
 
     for (;;) {
@@ -225,7 +242,7 @@ Node *add() {
 }
 
 // mul = unary ("*" unary | "/" unary)*
-Node *mul() {
+static Node *mul() {
     Node *node = unary();
 
     for (;;) {
@@ -243,7 +260,7 @@ Node *mul() {
 //       | "*" unary
 //       | "&" unary
 //       | primary
-Node *unary() {
+static Node *unary() {
     if (consume("+"))
         return primary();
     if (consume("-"))
@@ -256,7 +273,7 @@ Node *unary() {
 }
 
 // primary = "(" expr ")" | num
-Node *primary() {
+static Node *primary() {
     // 次のトークンが"("なら、"(" expr ")"のはず
     if (consume("(")) {
         Node *node = expr();
@@ -268,7 +285,7 @@ Node *primary() {
     if (tok) {
         Node *node = calloc(1, sizeof(Node));
         if(consume("(")){
-            node->kind = ND_FUNCTION;
+            node->kind = ND_FUNCCALL;
             node->name = tok->str;
             node->len = tok->len;
             if(!consume(")")) {
@@ -301,7 +318,7 @@ Node *primary() {
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
-bool consume(char *op) {
+static bool consume(char *op) {
     if (token->kind != TK_RESERVED || 
         strlen(op) != token->len ||
         memcmp(token->str, op, token->len))
@@ -310,7 +327,7 @@ bool consume(char *op) {
     return true;
 }
 
-extern Token *consume_ident() {
+static Token *consume_ident() {
     if (token->kind == TK_IDENT) {
         Token *rtn = token;
         token = token->next;
@@ -321,7 +338,7 @@ extern Token *consume_ident() {
 
 // 次のトークンが期待している記号の時には、トークンを1つ読み進める。
 // それ以外の場合はエラーを報告する。
-void expect(char *op) {
+static void expect(char *op) {
     if (token->kind != TK_RESERVED || strlen(op) != token->len ||
         memcmp(token->str, op, token->len)) {
         error_at(token->str, "'%s'ではありません", op);
@@ -331,7 +348,7 @@ void expect(char *op) {
 
 // 次のトークンが数値の場合、トークンを1つ読み進めてその数値を返す。
 // それ以外の場合にはエラーを報告する、
-int expect_number() {
+static int expect_number() {
     if (token->kind != TK_NUM)
         error_at(token->str, "数ではありません");
     int val = token->val;
@@ -339,7 +356,7 @@ int expect_number() {
     return val;
 }
 
-extern bool at_eof() {
+static bool at_eof() {
     return token->kind == TK_EOF;
 }
 

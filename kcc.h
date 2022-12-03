@@ -25,7 +25,7 @@ typedef enum {
     ND_FOR,     // for文
     ND_NUM, // 整数
     ND_BLOCK, //ブロック
-    ND_FUNCTION, // 関数
+    ND_FUNCCALL, // 関数呼び出し
     ND_FUNCDEF, // 関数定義
     ND_ADDR,    // アドレス参照
     ND_DEREF    // 間接参照
@@ -79,33 +79,15 @@ extern char *user_input;
 // 現在着目しているトークン
 extern Token *token;
 
-extern Node *code[100];
+extern Token *tokenize();
 
-extern Node *def_func();
-extern Node *dcl();
-extern Node *assign();
-extern Node *expr();
-extern Node *stmt();
-extern Node *expr();
+extern Node *code[100];
 extern void program();
-extern Node *equality();
-extern Node *relational();
-extern Node *add();
-extern Node *mul();
-extern Node *unary();
-extern Node *primary();
-extern void gen_lval(Node *node);
-extern void gen(Node *node);
+
 extern Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 extern Node *new_node_num(int val);
 
-extern Token *tokenize();
-extern bool startswith(char *p, char *q);
-extern Token *new_token(TokenKind kind, Token *cur, char *str, int len);
-extern bool at_eof();
-extern int expect_number();
-extern void expect(char *op);
-extern Token *consume_ident();
-extern bool consume(char *op);
+extern void gen(Node *node);
+
 extern void error_at(char *loc, char *fmt, ...);
 extern void error(char *fmt, ...);

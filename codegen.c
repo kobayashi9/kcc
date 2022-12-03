@@ -3,8 +3,9 @@
 static int labelseq = 1;
 static char funcname[50];
 static char funcargs[7][4] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+static void gen_lval(Node *node);
 
-void gen_lval(Node *node) {
+static void gen_lval(Node *node) {
     if (node->kind != ND_LVAR)
         error("代入の左辺値が変数ではありません");
     
@@ -101,7 +102,7 @@ void gen(Node *node) {
         printf("    mov [rax], rdi\n");
         printf("    push rdi\n");
         return;
-    case ND_FUNCTION: {
+    case ND_FUNCCALL: {
         int funcargsIndex = 0;
         for(int i = 0; i < node->len; i++) {
             funcname[i] = node->name[i];
